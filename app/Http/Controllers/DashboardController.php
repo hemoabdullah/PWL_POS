@@ -8,7 +8,7 @@ class DashboardController extends Controller
 {
     public function index() {
         $metadata = [
-            'pageTitle' => 'Hammam Dashboard',
+            'pageTitle' => 'Dashboard',
             'breadcrumbs' => [
                 [
                     'name' => 'Dashboard',

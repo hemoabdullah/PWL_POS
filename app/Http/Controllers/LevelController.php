@@ -7,6 +7,7 @@ use App\Models\Level;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Log;
 
 class LevelController extends Controller
 {
@@ -67,20 +68,34 @@ class LevelController extends Controller
         return view('pages.level.update', compact('metadata', 'level'));
     }
 
-    public function list(Request $request) {
-        $levels = Level::all();
-
-        return DataTables::of($levels)
-        ->addIndexColumn()
-        ->addColumn('actions', function ($level) {
-            $btn = '<a href="' . route('levels.show', ['id' => $level->level_id]) . '" class="btn btn-primary btn-sm">Details</a>';
-            $btn .= '<a href="' . route('levels.update-page', ['id' => $level->level_id]) . '" class="btn btn-warning btn-sm ml-0 ml-md-2">Update</a>';
-            $btn .= '<form action="' . route('levels.delete', ['id' => $level->level_id]) . '" method="POST" style="display:inline-block;">' . csrf_field() . method_field('DELETE') . '<button type="submit" class="btn btn-danger btn-sm ml-0 ml-md-2" onclick="return confirm(\'Are you sure you want to delete this level?\')">Delete</button></form>';
-
-            return $btn;
-        })
-        ->rawColumns(['actions'])
-        ->make(true);
+    public function list(Request $request)
+    {
+        try {
+            $levels = Level::select(['level_id', 'level_code', 'level_name', 'created_at']);
+    
+            return DataTables::eloquent($levels)
+                ->addIndexColumn()
+                ->addColumn('actions', function ($level) {
+                    return '
+                        <div class="btn-group">
+                            <a href="'.route('levels.show', $level->level_id).'" class="btn btn-sm btn-primary">View</a>
+                            <a href="'.route('levels.update-page', $level->level_id).'" class="btn btn-sm btn-warning">Edit</a>
+                            <form action="'.route('levels.delete', $level->level_id).'" method="POST" class="d-inline">
+                                '.csrf_field().'
+                                '.method_field('DELETE').'
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'Are you sure?\')">Delete</button>
+                            </form>
+                        </div>
+                    ';
+                })
+                ->rawColumns(['actions'])
+                ->toJson();
+        } catch (\Exception $e) {
+            Log::error('DataTables Error: '.$e->getMessage());
+            return response()->json([
+                'error' => 'Error loading data'
+            ], 500);
+        }
     }
 
     public function store(LevelRequest $request) {
@@ -92,6 +107,28 @@ class LevelController extends Controller
         ]);
 
         return redirect()->route('levels.page')->with('success', 'Level created successfully.')->withInput($request->only('level_code', 'level_name'));
+    }
+
+    public function storeAjax(LevelRequest $request) {
+        if (!$request->validated()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create level. Please check again your data.',
+                'errors' => $request->errors(),
+            ]);
+        }
+
+        $validatedData = $request->validated();
+        Level::create([
+            'level_code' => $validatedData['level_code'],
+            'level_name' => $validatedData['level_name'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Level created successfully.',
+            'data' => $validatedData
+        ]);
     }
 
     public function show(string $id) {
@@ -113,6 +150,16 @@ class LevelController extends Controller
         return view('pages.level.show', compact('level', 'metadata'));
     }
 
+    public function showAjax(string $id) {
+        $level = Level::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Level details found.',
+            'data' => $level
+        ]);
+    }
+
     public function update(LevelRequest $request, string $id) {
         $validatedData = $request->validated();
 
@@ -125,10 +172,45 @@ class LevelController extends Controller
         return redirect()->route('levels.page')->with('success', 'Level updated successfully.')->withInput($request->only('level_code', 'level_name'));
     }
 
+    public function updateAjax(LevelRequest $request, string $id) {
+        if (!$request->validated()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update level. Please check again your data.',
+                'errors' => $request->errors(),
+            ]);
+        }
+
+        $validatedData = $request->validated();
+
+        $level = Level::findOrFail($id);
+        $level->update([
+            'level_code' => $validatedData['level_code'],
+            'level_name' => $validatedData['level_name'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Level updated successfully.',
+            'data' => $validatedData
+        ]);
+    }
+
     public function delete(string $id) {
         $level = Level::findOrFail($id);
         $level->delete();
 
         return redirect()->route('levels.page')->with('success', 'Level deleted successfully.');
+    }
+
+    public function deleteAjax(string $id) {
+        $level = Level::findOrFail($id);
+        $level->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Level deleted successfully.',
+            'data' => $level
+        ]);
     }
 }

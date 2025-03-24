@@ -1,4 +1,5 @@
 <?php
+Illuminate\View\ViewServiceProvider::class;
 
 return [
 
@@ -14,7 +15,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-// ll
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

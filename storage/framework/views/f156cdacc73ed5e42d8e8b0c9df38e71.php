@@ -1,0 +1,1 @@
+<h1><?php echo e($metadata['pageTitle']); ?></h1><?php /**PATH C:\laragon\www\pwl-pos\resources\views/components/page-title.blade.php ENDPATH**/ ?>

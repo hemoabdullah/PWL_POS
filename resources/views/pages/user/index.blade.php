@@ -36,6 +36,8 @@
                         </div>
                     </div>
                     <a href="{{ route('users.store-page') }}" class="btn btn-primary btn-sm ml-0 ml-md-2">Create New User</a>
+                    <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
+                        data-target="#newUserAjaxModal">Create New User (AJAX)</button>
                 </div>
             </div>
         </div>
@@ -48,11 +50,17 @@
                         <th>Name</th>
                         <th>Level</th>
                         <th>Actions</th>
+                        <th>Actions AJAX</th>
                     </tr>
                 </thead>
             </table>
         </div>
     </div>
+
+    {{-- Load Modals --}}
+    @include('pages.user.components.store-ajax')
+    @include('pages.user.components.update-ajax')
+    @include('pages.user.components.details-ajax')
 @endsection
 
 @push('scripts')
@@ -71,12 +79,11 @@
             },
             columns: [
                 {
-                    data: "Hammam",
+                    data: "DT_RowIndex",
                     className: "text-center",
                     orderable: false,
                     searchable: false
                 },
-                
                 {
                     data: "username",
                     orderable: true,
@@ -97,11 +104,52 @@
                     orderable: false,
                     searchable: false
                 },
+                {
+                    data: "actions-ajax",
+                    orderable: false,
+                    searchable: false
+                },
             ],
         });
 
         $('#level_id').on('change', function () {
             usersDataTable.ajax.reload();
+        });
+    </script>
+
+    {{-- Delete User --}}
+    <script>
+        $(document).on('click', '.delete-user-ajax-btn', function() {
+            let userId = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/users/${userId}/delete-ajax`,
+                        type: 'DELETE',
+                        success: function(response) {
+                            Swal.fire(
+                                'Deleted!',
+                                response.message,
+                                'success'
+                            );
+
+                            $('#usersTable').DataTable().ajax.reload();
+                        },
+                        error: function(xhr) {
+                            console.log(xhr.responseText);
+                        }
+                    });
+                }
+            });
         });
     </script>
 @endpush

@@ -4,5 +4,5 @@
 
 @section('contents')
     <h1>Dashboard</h1>
-    <p>This is the Hammam dashboard.</p>
+    <p>This is the dashboard page.</p>
 @endsection
