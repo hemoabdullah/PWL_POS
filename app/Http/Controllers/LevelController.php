@@ -7,7 +7,6 @@ use App\Models\Level;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Log;
 
 class LevelController extends Controller
 {
@@ -68,34 +67,27 @@ class LevelController extends Controller
         return view('pages.level.update', compact('metadata', 'level'));
     }
 
-    public function list(Request $request)
-    {
-        try {
-            $levels = Level::select(['level_id', 'level_code', 'level_name', 'created_at']);
-    
-            return DataTables::eloquent($levels)
-                ->addIndexColumn()
-                ->addColumn('actions', function ($level) {
-                    return '
-                        <div class="btn-group">
-                            <a href="'.route('levels.show', $level->level_id).'" class="btn btn-sm btn-primary">View</a>
-                            <a href="'.route('levels.update-page', $level->level_id).'" class="btn btn-sm btn-warning">Edit</a>
-                            <form action="'.route('levels.delete', $level->level_id).'" method="POST" class="d-inline">
-                                '.csrf_field().'
-                                '.method_field('DELETE').'
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'Are you sure?\')">Delete</button>
-                            </form>
-                        </div>
-                    ';
-                })
-                ->rawColumns(['actions'])
-                ->toJson();
-        } catch (\Exception $e) {
-            Log::error('DataTables Error: '.$e->getMessage());
-            return response()->json([
-                'error' => 'Error loading data'
-            ], 500);
-        }
+    public function list(Request $request) {
+        $levels = Level::all();
+
+        return DataTables::of($levels)
+        ->addIndexColumn()
+        ->addColumn('actions', function ($level) {
+            $btn = '<a href="' . route('levels.show', ['id' => $level->level_id]) . '" class="btn btn-primary btn-sm">Details</a>';
+            $btn .= '<a href="' . route('levels.update-page', ['id' => $level->level_id]) . '" class="btn btn-warning btn-sm ml-0 ml-md-2">Update</a>';
+            $btn .= '<form action="' . route('levels.delete', ['id' => $level->level_id]) . '" method="POST" style="display:inline-block;">' . csrf_field() . method_field('DELETE') . '<button type="submit" class="btn btn-danger btn-sm ml-0 ml-md-2" onclick="return confirm(\'Are you sure you want to delete this level?\')">Delete</button></form>';
+
+            return $btn;
+        })
+        ->addColumn('actions-ajax', function ($level) {
+            $btn = '<button type="button" class="details-level-ajax-btn btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal" data-target="#detailsLevelAjaxModal" data-id="' . $level->level_id . '">Details</button>';
+            $btn .= '<button type="button" class="update-level-ajax-btn btn btn-warning btn-sm ml-0 ml-md-2" data-toggle="modal" data-target="#updateLevelAjaxModal" data-id="' . $level->level_id . '">Update</button>';
+            $btn .= '<button type="button" class="delete-level-ajax-btn btn btn-danger btn-sm ml-0 ml-md-2" data-id="' . $level->level_id . '">Delete</button>';
+
+            return $btn;
+        })
+        ->rawColumns(['actions', 'actions-ajax'])
+        ->make(true);
     }
 
     public function store(LevelRequest $request) {

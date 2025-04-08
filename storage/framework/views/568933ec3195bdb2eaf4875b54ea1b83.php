@@ -66,13 +66,13 @@
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <div class="dropdown-item">
-                    <i class="fas fa-user-circle mr-2 text-secondary"></i> <span class="text-secondary">{{ Auth::user()->name }}</span>
+                    <i class="fas fa-user-circle mr-2 text-secondary"></i> <span class="text-secondary"><?php echo e(Auth::user()->name); ?></span>
                 </div>
                 <div class="dropdown-divider"></div>
                 <a href="#" class="dropdown-item">
                     <i class="fas fa-user mr-2"></i> Profile
                 </a>
-                <a href="{{ route('auth.logout-action') }}" class="dropdown-item">
+                <a href="<?php echo e(route('auth.logout-action')); ?>" class="dropdown-item">
                     <i class="fas fa-sign-out-alt mr-2"></i> Logout
                 </a>
             </div>
@@ -84,3 +84,4 @@
         </li>
     </ul>
 </nav>
+<?php /**PATH C:\laragon\www\week-3\pwl-pos\resources\views/components/navbar.blade.php ENDPATH**/ ?>
