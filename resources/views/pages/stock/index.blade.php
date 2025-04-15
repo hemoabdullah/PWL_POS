@@ -8,20 +8,25 @@
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <strong>Success!</strong> {{ session('success') }}
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+                <span aria-hidden="true">&times;</span>
             </button>
         </div>
     @endif
-    
+
     {{-- Contents --}}
     <div class="card">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
                 <p class="my-0 fs-4">Stocks Table</p>
                 <div class="d-flex align-items-center">
-                    <a href="{{ route('stocks.store-page') }}" class="btn btn-primary btn-sm ml-0 ml-md-2">Create New Stock</a>
+                    <a href="{{ route('stocks.store-page') }}" class="btn btn-primary btn-sm ml-0 ml-md-2">Create New
+                        Stock</a>
                     <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
                         data-target="#newStockAjaxModal">Create New Stock (AJAX)</button>
+                    <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
+                        data-target="#importExcelStockAjaxModal">Import Data (AJAX)</button>
+                    <a href="{{ route('stocks.export-excel') }}" class="btn btn-primary btn-sm ml-0 ml-md-2">Export Excel</a>
+                    <a href="{{ route('stocks.export-pdf') }}" target="_blank" class="btn btn-primary btn-sm ml-0 ml-md-2">Export PDF</a>
                 </div>
             </div>
         </div>
@@ -45,6 +50,7 @@
     @include('pages.stock.components.store-ajax')
     @include('pages.stock.components.update-ajax')
     @include('pages.stock.components.details-ajax')
+    @include('pages.stock.components.import-excel-data-ajax')
 @endsection
 
 @push('scripts')
@@ -58,8 +64,7 @@
                 dataType: "JSON",
                 type: "GET",
             },
-            columns: [
-                {
+            columns: [{
                     data: "DT_RowIndex",
                     className: "text-center",
                     orderable: false,
@@ -94,39 +99,39 @@
         });
     </script>
 
-        {{-- Delete Stock --}}
-        <script>
-            $(document).on('click', '.delete-stock-ajax-btn', function() {
-                let stockId = $(this).data('id');
-    
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: `/stocks/${stockId}/delete-ajax`,
-                            type: 'DELETE',
-                            success: function(response) {
-                                Swal.fire(
-                                    'Deleted!',
-                                    response.message,
-                                    'success'
-                                );
-    
-                                $('#stocksTable').DataTable().ajax.reload();
-                            },
-                            error: function(xhr) {
-                                console.log(xhr.responseText);
-                            }
-                        });
-                    }
-                });
+    {{-- Delete Stock --}}
+    <script>
+        $(document).on('click', '.delete-stock-ajax-btn', function() {
+            let stockId = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/stocks/${stockId}/delete-ajax`,
+                        type: 'DELETE',
+                        success: function(response) {
+                            Swal.fire(
+                                'Deleted!',
+                                response.message,
+                                'success'
+                            );
+
+                            $('#stocksTable').DataTable().ajax.reload();
+                        },
+                        error: function(xhr) {
+                            console.log(xhr.responseText);
+                        }
+                    });
+                }
             });
-        </script>
+        });
+    </script>
 @endpush

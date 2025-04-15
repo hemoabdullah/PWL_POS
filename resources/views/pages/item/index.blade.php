@@ -22,6 +22,10 @@
                     <a href="{{ route('items.store-page') }}" class="btn btn-primary btn-sm ml-0 ml-md-2">Create New Item</a>
                     <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
                         data-target="#newItemAjaxModal">Create New Item (AJAX)</button>
+                    <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
+                    data-target="#importExcelItemAjaxModal">Import Data (AJAX)</button>
+                    <a href="{{ route('items.export-excel') }}" class="btn btn-primary btn-sm ml-0 ml-md-2">Export Excel</a>
+                    <a href="{{ route('items.export-pdf') }}" target="_blank" class="btn btn-primary btn-sm ml-0 ml-md-2">Export PDF</a>
                 </div>
             </div>
         </div>
@@ -45,6 +49,7 @@
     @include('pages.item.components.store-ajax')
     @include('pages.item.components.update-ajax')
     @include('pages.item.components.details-ajax')
+    @include('pages.item.components.import-excel-data-ajax')
 @endsection
 
 @push('scripts')

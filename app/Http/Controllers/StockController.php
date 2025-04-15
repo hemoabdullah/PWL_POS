@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\StockExport;
+use App\Http\Requests\ImportExcelRequest;
 use App\Http\Requests\StockRequest;
+use App\Imports\StockImport;
 use App\Models\Item;
 use App\Models\Stock;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class StockController extends Controller
@@ -209,5 +215,47 @@ class StockController extends Controller
             'message' => 'Stock deleted successfully.',
             'data' => $stock
         ]);
+    }
+
+    public function importExcelAjax(ImportExcelRequest $request) {
+        if (!$request->validated()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to import Excel file. Please check again your data.',
+                'errors' => $request->errors(),
+            ]);
+        }
+
+        $excelFile = $request->file('file');
+    
+        try {
+            Excel::import(new StockImport, $excelFile);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Stock data imported successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to import Excel file.',
+                'errors' => 'Error: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function exportExcel() {
+        return Excel::download(new StockExport, 'stocks.xlsx');
+    }
+
+    public function exportPdf() {
+        $stocks = Stock::with('item')->get();
+
+        $pdf = Pdf::loadView('pages.stock.export-pdf', compact('stocks'));
+        $pdf->setPaper('a4', 'potrait');
+        $pdf->setOption('isRemoteEnabled', true);
+        $pdf->render();
+
+        return $pdf->stream('Stocks data ' . Carbon::now()->format('d-m-Y') . '.pdf');
     }
 }

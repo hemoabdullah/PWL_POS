@@ -37,6 +37,10 @@
                     <a href="<?php echo e(route('users.store-page')); ?>" class="btn btn-primary btn-sm ml-0 ml-md-2">Create New User</a>
                     <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
                         data-target="#newUserAjaxModal">Create New User (AJAX)</button>
+                    <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
+                    data-target="#importExcelUserAjaxModal">Import Data (AJAX)</button>
+                    <a href="<?php echo e(route('users.export-excel')); ?>" class="btn btn-primary btn-sm ml-0 ml-md-2">Export Excel</a>
+                    <a href="<?php echo e(route('users.export-pdf')); ?>" target="_blank" class="btn btn-primary btn-sm ml-0 ml-md-2">Export PDF</a>
                 </div>
             </div>
         </div>
@@ -60,6 +64,7 @@
     <?php echo $__env->make('pages.user.components.store-ajax', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php echo $__env->make('pages.user.components.update-ajax', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php echo $__env->make('pages.user.components.details-ajax', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php echo $__env->make('pages.user.components.import-excel-data-ajax', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('scripts'); ?>

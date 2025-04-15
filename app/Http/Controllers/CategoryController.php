@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CategoryExport;
 use App\Http\Requests\CategoryRequest;
+use App\Http\Requests\ImportExcelRequest;
+use App\Imports\CategoryImport;
 use App\Models\Category;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class CategoryController extends Controller
@@ -203,5 +209,47 @@ class CategoryController extends Controller
             'message' => 'Category deleted successfully.',
             'data' => $category
         ]);
+    }
+
+    public function importExcelAjax(ImportExcelRequest $request) {
+        if (!$request->validated()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to import Excel file. Please check again your data.',
+                'errors' => $request->errors(),
+            ]);
+        }
+
+        $excelFile = $request->file('file');
+    
+        try {
+            Excel::import(new CategoryImport, $excelFile);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Category data imported successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to import Excel file.',
+                'errors' => 'Error: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function exportExcel() {
+        return Excel::download(new CategoryExport, 'categories.xlsx');
+    }
+
+    public function exportPdf() {
+        $categories = Category::all();
+
+        $pdf = Pdf::loadView('pages.category.export-pdf', compact('categories'));
+        $pdf->setPaper('a4', 'potrait');
+        $pdf->setOption('isRemoteEnabled', true);
+        $pdf->render();
+
+        return $pdf->stream('Categories data ' . Carbon::now()->format('d-m-Y') . '.pdf');
     }
 }

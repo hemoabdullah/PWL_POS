@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ItemExport;
+use App\Http\Requests\ImportExcelRequest;
 use App\Http\Requests\ItemRequest;
+use App\Imports\ItemImport;
 use App\Models\Category;
 use App\Models\Item;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class ItemController extends Controller
@@ -218,5 +224,47 @@ class ItemController extends Controller
             'message' => 'Item deleted successfully.',
             'data' => $item
         ]);
+    }
+
+    public function importExcelAjax(ImportExcelRequest $request) {
+        if (!$request->validated()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to import Excel file. Please check again your data.',
+                'errors' => $request->errors(),
+            ]);
+        }
+
+        $excelFile = $request->file('file');
+    
+        try {
+            Excel::import(new ItemImport, $excelFile);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Item data imported successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to import Excel file.',
+                'errors' => 'Error: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function exportExcel() {
+        return Excel::download(new ItemExport, 'items.xlsx');
+    }
+
+    public function exportPdf() {
+        $items = Item::with('category')->get();
+
+        $pdf = Pdf::loadView('pages.item.export-pdf', compact('items'));
+        $pdf->setPaper('a4', 'potrait');
+        $pdf->setOption('isRemoteEnabled', true);
+        $pdf->render();
+
+        return $pdf->stream('Items data ' . Carbon::now()->format('d-m-Y') . '.pdf');
     }
 }

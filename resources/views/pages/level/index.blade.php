@@ -22,6 +22,10 @@
                     <a href="{{ route('levels.store-page') }}" class="btn btn-primary btn-sm">Create New Level</a>
                     <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
                         data-target="#newLevelAjaxModal">Create New Level (AJAX)</button>
+                    <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
+                        data-target="#importExcelLevelAjaxModal">Import Data (AJAX)</button>
+                    <a href="{{ route('levels.export-excel') }}" class="btn btn-primary btn-sm ml-0 ml-md-2">Export Excel</a>
+                    <a href="{{ route('levels.export-pdf') }}" target="_blank" class="btn btn-primary btn-sm ml-0 ml-md-2">Export PDF</a>
                 </div>
             </div>
         </div>
@@ -44,6 +48,7 @@
     @include('pages.level.components.store-ajax')
     @include('pages.level.components.update-ajax')
     @include('pages.level.components.details-ajax')
+    @include('pages.level.components.import-excel-data-ajax')
 @endsection
 
 @push('scripts')

@@ -6,6 +6,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\UserController;
@@ -28,11 +29,19 @@ Route::prefix('/auth')->group(function () {
 
 Route::middleware(['check-auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::prefix('settings')->group(function () {
+        Route::prefix('profile')->group(function () {
+            Route::get('', [ProfileController::class, 'index'])->name('settings.profile');
+            Route::patch('/profile-picture/update', [ProfileController::class, 'updateProfilePicture'])->name('settings.profile.update-profile-picture'); 
+        });
+    });
     // Route with Admin level middleware
     Route::middleware(['authorize-level:ADM'])->group(function () {
         // User Routes
         Route::prefix('/users')->group(function () {
             Route::get('', [UserController::class, 'page'])->name('users.page');
+            Route::get('/export-excel', [UserController::class, 'exportExcel'])->name('users.export-excel');
+            Route::get('/export-pdf', [UserController::class, 'exportPdf'])->name('users.export-pdf');
             Route::get('/list', [UserController::class, 'list'])->name('users.list');
             Route::get('/store', [UserController::class, 'storePage'])->name('users.store-page');
             Route::get('/{id}', [UserController::class, 'show'])->name('users.show');
@@ -44,10 +53,13 @@ Route::middleware(['check-auth'])->group(function () {
             Route::delete('/{id}/delete-ajax', [UserController::class, 'deleteAjax'])->name('users.delete-ajax');
             Route::post('/store', [UserController::class, 'store'])->name('users.store');
             Route::post('/store-ajax', [UserController::class, 'storeAjax'])->name('users.store-ajax');
+            Route::post('/import-excel-ajax', [UserController::class, 'importExcelAjax'])->name('users.import-excel-ajax');
         });
         // Level Routes
         Route::prefix('/levels')->group(function () {
             Route::get('', [LevelController::class, 'page'])->name('levels.page');
+            Route::get('/export-excel', [LevelController::class, 'exportExcel'])->name('levels.export-excel');
+            Route::get('/export-pdf', [LevelController::class, 'exportPdf'])->name('levels.export-pdf');
             Route::get('/list', [LevelController::class, 'list'])->name('levels.list');
             Route::get('/store', [LevelController::class, 'storePage'])->name('levels.store-page');
             Route::get('/{id}', [LevelController::class, 'show'])->name('levels.show');
@@ -59,6 +71,7 @@ Route::middleware(['check-auth'])->group(function () {
             Route::delete('/{id}/delete-ajax', [LevelController::class, 'deleteAjax'])->name('levels.delete-ajax');
             Route::post('/store', [LevelController::class, 'store'])->name('levels.store');
             Route::post('/store-ajax', [LevelController::class, 'storeAjax'])->name('levels.store-ajax');
+            Route::post('/import-excel-ajax', [LevelController::class, 'importExcelAjax'])->name('levels.import-excel-ajax');
         });
     });
 
@@ -67,6 +80,8 @@ Route::middleware(['check-auth'])->group(function () {
         // Category Routes
         Route::prefix('/categories')->group(function () {
             Route::get('', [CategoryController::class, 'page'])->name('categories.page');
+            Route::get('/export-excel', [CategoryController::class, 'exportExcel'])->name('categories.export-excel');
+            Route::get('/export-pdf', [CategoryController::class, 'exportPdf'])->name('categories.export-pdf');
             Route::get('/list', [CategoryController::class, 'list'])->name('categories.list');
             Route::get('/store', [CategoryController::class, 'storePage'])->name('categories.store-page');
             Route::get('/{id}', [CategoryController::class, 'show'])->name('categories.show');
@@ -78,10 +93,13 @@ Route::middleware(['check-auth'])->group(function () {
             Route::delete('/{id}/delete-ajax', [CategoryController::class, 'deleteAjax'])->name('categories.delete-ajax');
             Route::post('/store', [CategoryController::class, 'store'])->name('categories.store');
             Route::post('/store-ajax', [CategoryController::class, 'storeAjax'])->name('categories.store-ajax');
+            Route::post('/import-excel-ajax', [CategoryController::class, 'importExcelAjax'])->name('categories.import-excel-ajax');
         });
         // Item Routes
         Route::prefix('/items')->group(function () {
             Route::get('', [ItemController::class, 'page'])->name('items.page');
+            Route::get('/export-excel', [ItemController::class, 'exportExcel'])->name('items.export-excel');
+            Route::get('/export-pdf', [ItemController::class, 'exportPdf'])->name('items.export-pdf');
             Route::get('/list', [ItemController::class, 'list'])->name('items.list');
             Route::get('/store', [ItemController::class, 'storePage'])->name('items.store-page');
             Route::get('/{id}', [ItemController::class, 'show'])->name('items.show');
@@ -93,10 +111,13 @@ Route::middleware(['check-auth'])->group(function () {
             Route::delete('/{id}/delete-ajax', [ItemController::class, 'deleteAjax'])->name('items.delete-ajax');
             Route::post('/store', [ItemController::class, 'store'])->name('items.store');
             Route::post('/store-ajax', [ItemController::class, 'storeAjax'])->name('items.store-ajax');
+            Route::post('/import-excel-ajax', [ItemController::class, 'importExcelAjax'])->name('items.import-excel-ajax');
         });
         // Stock Routes
         Route::prefix('/stocks')->group(function () {
             Route::get('', [StockController::class, 'page'])->name('stocks.page');
+            Route::get('/export-excel', [StockController::class, 'exportExcel'])->name('stocks.export-excel');
+            Route::get('/export-pdf', [StockController::class, 'exportPdf'])->name('stocks.export-pdf');
             Route::get('/list', [StockController::class, 'list'])->name('stocks.list');
             Route::get('/store', [StockController::class, 'storePage'])->name('stocks.store-page');
             Route::get('/{id}', [StockController::class, 'show'])->name('stocks.show');
@@ -108,6 +129,7 @@ Route::middleware(['check-auth'])->group(function () {
             Route::delete('/{id}/delete-ajax', [StockController::class, 'deleteAjax'])->name('stocks.delete-ajax');
             Route::post('/store', [StockController::class, 'store'])->name('stocks.store');
             Route::post('/store-ajax', [StockController::class, 'storeAjax'])->name('stocks.store-ajax');
+            Route::post('/import-excel-ajax', [StockController::class, 'importExcelAjax'])->name('stocks.import-excel-ajax');
         });
     });
 });

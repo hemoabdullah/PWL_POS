@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UserExport;
+use App\Http\Requests\ImportExcelRequest;
 use App\Http\Requests\UserRequest;
+use App\Imports\UserImport;
 use App\Models\Level;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -218,5 +224,47 @@ class UserController extends Controller
             'message' => 'User deleted successfully.',
             'data' => $user
         ]);
+    }
+
+    public function importExcelAjax(ImportExcelRequest $request) {
+        if (!$request->validated()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to import Excel file. Please check again your data.',
+                'errors' => $request->errors(),
+            ]);
+        }
+
+        $excelFile = $request->file('file');
+    
+        try {
+            Excel::import(new UserImport, $excelFile);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'User data imported successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to import Excel file.',
+                'errors' => 'Error: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function exportExcel() {
+        return Excel::download(new UserExport, 'users.xlsx');
+    }
+
+    public function exportPdf() {
+        $users = User::with('level')->get();
+
+        $pdf = Pdf::loadView('pages.user.export-pdf', compact('users'));
+        $pdf->setPaper('a4', 'potrait');
+        $pdf->setOption('isRemoteEnabled', true);
+        $pdf->render();
+
+        return $pdf->stream('Users data ' . Carbon::now()->format('d-m-Y') . '.pdf');
     }
 }

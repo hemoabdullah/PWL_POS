@@ -22,6 +22,10 @@
                     <a href="{{ route('categories.store-page') }}" class="btn btn-primary btn-sm ml-0 ml-md-2">Create New Category</a>
                     <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
                         data-target="#newCategoryAjaxModal">Create New Category (AJAX)</button>
+                    <button type="button" class="btn btn-primary btn-sm ml-0 ml-md-2" data-toggle="modal"
+                    data-target="#importExcelCategoryAjaxModal">Import Data (AJAX)</button>
+                    <a href="{{ route('categories.export-excel') }}" class="btn btn-primary btn-sm ml-0 ml-md-2">Export Excel</a>
+                    <a href="{{ route('categories.export-pdf') }}" target="_blank" class="btn btn-primary btn-sm ml-0 ml-md-2">Export PDF</a>
                 </div>
             </div>
         </div>
@@ -44,6 +48,7 @@
     @include('pages.category.components.store-ajax')
     @include('pages.category.components.update-ajax')
     @include('pages.category.components.details-ajax')
+    @include('pages.category.components.import-excel-data-ajax')
 @endsection
 
 @push('scripts')

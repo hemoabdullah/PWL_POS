@@ -69,7 +69,7 @@
                     <i class="fas fa-user-circle mr-2 text-secondary"></i> <span class="text-secondary"><?php echo e(Auth::user()->name); ?></span>
                 </div>
                 <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
+                <a href="<?php echo e(route('settings.profile')); ?>" class="dropdown-item">
                     <i class="fas fa-user mr-2"></i> Profile
                 </a>
                 <a href="<?php echo e(route('auth.logout-action')); ?>" class="dropdown-item">

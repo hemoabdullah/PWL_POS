@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\LevelExport;
+use App\Http\Requests\ImportExcelRequest;
 use App\Http\Requests\LevelRequest;
+use App\Imports\LevelImport;
 use App\Models\Level;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class LevelController extends Controller
@@ -204,5 +210,47 @@ class LevelController extends Controller
             'message' => 'Level deleted successfully.',
             'data' => $level
         ]);
+    }
+
+    public function importExcelAjax(ImportExcelRequest $request) {
+        if (!$request->validated()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to import Excel file. Please check again your data.',
+                'errors' => $request->errors(),
+            ]);
+        }
+
+        $excelFile = $request->file('file');
+    
+        try {
+            Excel::import(new LevelImport, $excelFile);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Level data imported successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to import Excel file.',
+                'errors' => 'Error: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function exportExcel() {
+        return Excel::download(new LevelExport, 'user-levels.xlsx');
+    }
+
+    public function exportPdf() {
+        $levels = Level::all();
+
+        $pdf = Pdf::loadView('pages.level.export-pdf', compact('levels'));
+        $pdf->setPaper('a4', 'potrait');
+        $pdf->setOption('isRemoteEnabled', true);
+        $pdf->render();
+
+        return $pdf->stream('Levels data ' . Carbon::now()->format('d-m-Y') . '.pdf');
     }
 }

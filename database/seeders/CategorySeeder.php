@@ -14,11 +14,12 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['category_id' => 1, 'category_code' => 'SNK1', 'category_name' => 'Sneaker Pria'],
-            ['category_id' => 2, 'category_code' => 'SNK2', 'category_name' => 'Sneaker Wanita'],
-            ['category_id' => 3, 'category_code' => 'OR1', 'category_name' => 'Sepatu Olahraga'],
-            ['category_id' => 4, 'category_code' => 'CAS1', 'category_name' => 'Casual'],
-            ['category_id' => 5, 'category_code' => 'SND1', 'category_name' => 'Sandal Pria'],
+                ['category_id' => 1, 'category_code' => 'HAM1', 'category_name' => 'Ham Series Alpha'],
+                ['category_id' => 2, 'category_code' => 'HEM2', 'category_name' => 'Hem Motion Line'],
+                ['category_id' => 3, 'category_code' => 'HEMO3', 'category_name' => 'Hemo Active Gear'],
+                ['category_id' => 4, 'category_code' => 'HAMAM4', 'category_name' => 'Hamam Urban Style'],
+                ['category_id' => 5, 'category_code' => 'H5', 'category_name' => 'H-Lite Footwear'],
+            
         ];
 
         Category::insert($data);
