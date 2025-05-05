@@ -46,8 +46,8 @@
                         <button type="submit" class="btn btn-primary btn-block">Sign In</button>
                     </form>
                     <p class="my-0 text-center">
-                        Don't have account?
-                        <a href="{{ route('auth.register-page') }}" class="text-center">Register a new one</a>
+                        You Don't have an account yet!!
+                        <a href="{{ route('auth.register-page') }}" class="text-center">Register Now</a>
                     </p>
                 </div>
             </div>

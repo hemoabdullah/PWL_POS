@@ -18,7 +18,7 @@
             @endif
             <div class="card">
                 <div class="card-body login-card-body">
-                    <p class="login-box-msg">Register a new account to start your session.</p>
+                    <p class="login-box-msg">Register to start your session.</p>
                     <form action="{{ route('auth.register-action') }}" method="POST" class="mb-4" id="registerForm">
                         @csrf
                         <div class="form-group">
@@ -57,7 +57,7 @@
                         <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
                     </form>
                     <p class="my-0 text-center">
-                        Already have account?
+                        I Already have an account!
                         <a href="{{ route('auth.login-page') }}" class="text-center">Login now.</a>
                     </p>
                 </div>

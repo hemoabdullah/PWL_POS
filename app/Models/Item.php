@@ -16,6 +16,7 @@ class Item extends Model
         'item_name',
         'item_buy_price',
         'item_sell_price',
+        'image'
     ];
 
     public function category(): HasOne {
